@@ -27,7 +27,7 @@
         <sys_class_name>sys_metadata_link</sys_class_name>
         <sys_created_by>bobby.edmonds</sys_created_by>
         <sys_created_on>2016-04-02 07:03:12</sys_created_on>
-        <sys_customer_update>true</sys_customer_update>
+        <sys_customer_update>false</sys_customer_update>
         <sys_id>232ab29d4fae56000cd561128110c733</sys_id>
         <sys_mod_count>0</sys_mod_count>
         <sys_name>Created 2016-04-01 23:26:57</sys_name>

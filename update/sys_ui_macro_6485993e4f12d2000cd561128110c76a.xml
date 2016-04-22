@@ -10,7 +10,7 @@
         <sys_class_name>sys_ui_macro</sys_class_name>
         <sys_created_by>admin</sys_created_by>
         <sys_created_on>2016-03-25 05:18:47</sys_created_on>
-        <sys_customer_update>true</sys_customer_update>
+        <sys_customer_update>false</sys_customer_update>
         <sys_id>6485993e4f12d2000cd561128110c76a</sys_id>
         <sys_mod_count>25</sys_mod_count>
         <sys_name>s3view</sys_name>

@@ -4,7 +4,7 @@
         <sys_class_name>sys_security_acl_role</sys_class_name>
         <sys_created_by>admin</sys_created_by>
         <sys_created_on>2016-03-24 04:55:37</sys_created_on>
-        <sys_customer_update>true</sys_customer_update>
+        <sys_customer_update>false</sys_customer_update>
         <sys_id>c29600664fda92000cd561128110c79c</sys_id>
         <sys_mod_count>0</sys_mod_count>
         <sys_name>x_snc_as_s3upload.x_snc_as.amazon_storage_admin</sys_name>

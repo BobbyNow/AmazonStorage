@@ -10,7 +10,7 @@
         <sys_class_name>sys_ui_macro</sys_class_name>
         <sys_created_by>admin</sys_created_by>
         <sys_created_on>2016-03-25 05:18:20</sys_created_on>
-        <sys_customer_update>true</sys_customer_update>
+        <sys_customer_update>false</sys_customer_update>
         <sys_id>a555553e4f12d2000cd561128110c7ba</sys_id>
         <sys_mod_count>34</sys_mod_count>
         <sys_name>s3upload</sys_name>

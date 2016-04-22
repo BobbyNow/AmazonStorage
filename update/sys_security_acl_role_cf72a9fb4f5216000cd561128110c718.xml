@@ -4,7 +4,7 @@
         <sys_class_name>sys_security_acl_role</sys_class_name>
         <sys_created_by>admin</sys_created_by>
         <sys_created_on>2016-03-28 08:49:10</sys_created_on>
-        <sys_customer_update>true</sys_customer_update>
+        <sys_customer_update>false</sys_customer_update>
         <sys_id>cf72a9fb4f5216000cd561128110c718</sys_id>
         <sys_mod_count>2</sys_mod_count>
         <sys_name>x_snc_as_properties.x_snc_as.amazon_storage_tenant_admin</sys_name>

@@ -127,7 +127,7 @@
         <sys_class_name>content_css</sys_class_name>
         <sys_created_by>bobby.edmonds</sys_created_by>
         <sys_created_on>2016-04-12 23:29:04</sys_created_on>
-        <sys_customer_update>true</sys_customer_update>
+        <sys_customer_update>false</sys_customer_update>
         <sys_id>02fab9344fb65a000cd561128110c797</sys_id>
         <sys_mod_count>0</sys_mod_count>
         <sys_name>x_snc_as_amazon_storage</sys_name>

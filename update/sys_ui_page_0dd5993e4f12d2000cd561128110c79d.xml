@@ -431,7 +431,7 @@
         <sys_class_name>sys_ui_page</sys_class_name>
         <sys_created_by>admin</sys_created_by>
         <sys_created_on>2016-03-25 05:20:29</sys_created_on>
-        <sys_customer_update>true</sys_customer_update>
+        <sys_customer_update>false</sys_customer_update>
         <sys_id>0dd5993e4f12d2000cd561128110c79d</sys_id>
         <sys_mod_count>321</sys_mod_count>
         <sys_name>s3view</sys_name>

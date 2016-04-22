@@ -75,7 +75,7 @@ AWSS3ClientUtil.prototype = Object.extendsObject(global.AbstractAjaxProcessor, {
         <sys_class_name>sys_script_include</sys_class_name>
         <sys_created_by>admin</sys_created_by>
         <sys_created_on>2016-03-25 05:24:07</sys_created_on>
-        <sys_customer_update>true</sys_customer_update>
+        <sys_customer_update>false</sys_customer_update>
         <sys_id>57761d3e4f12d2000cd561128110c72f</sys_id>
         <sys_mod_count>34</sys_mod_count>
         <sys_name>AWSS3ClientUtil</sys_name>

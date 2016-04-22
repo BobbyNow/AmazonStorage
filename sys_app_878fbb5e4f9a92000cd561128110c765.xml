@@ -3,7 +3,7 @@
     <sys_app action="INSERT_OR_UPDATE">
         <active>true</active>
         <enforce_license>log</enforce_license>
-        <js_level/>
+        <js_level>traditional</js_level>
         <licensable>true</licensable>
         <logo/>
         <menu display_value="Amazon S3">4d6088aa4f9a92000cd561128110c7ba</menu>

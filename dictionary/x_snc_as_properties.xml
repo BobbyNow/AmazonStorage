@@ -10,5 +10,8 @@
         <index name="index">
             <element name="sys_domain"/>
         </index>
+        <index name="index2">
+            <element name="sys_domain_path"/>
+        </index>
     </element>
 </database>

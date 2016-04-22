@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<record_update table="sys_metadata_link">
+    <sys_metadata_link action="INSERT_OR_UPDATE">
+        <directory>unload.demo</directory>
+        <documentkey>38493e5d4fae56000cd561128110c7f4</documentkey>
+        <payload><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
 <record_update sys_domain="c94122494a362312007f2ce5bd78768f" table="sys_user">
     <sys_user action="INSERT_OR_UPDATE">
         <accumulated_roles/>
@@ -67,4 +72,22 @@
         <x_snc_yun_relay_host/>
         <zip/>
     </sys_user>
+</record_update>
+]]></payload>
+        <sys_class_name>sys_metadata_link</sys_class_name>
+        <sys_created_by>bobby.edmonds</sys_created_by>
+        <sys_created_on>2016-04-02 07:02:01</sys_created_on>
+        <sys_customer_update>true</sys_customer_update>
+        <sys_id>d2e9329d4fae56000cd561128110c7bf</sys_id>
+        <sys_mod_count>1</sys_mod_count>
+        <sys_name>AWS Initech Admin</sys_name>
+        <sys_package display_value="Amazon Storage" source="x_snc_as">878fbb5e4f9a92000cd561128110c765</sys_package>
+        <sys_policy/>
+        <sys_replace_on_upgrade>false</sys_replace_on_upgrade>
+        <sys_scope display_value="Amazon Storage">878fbb5e4f9a92000cd561128110c765</sys_scope>
+        <sys_update_name>sys_metadata_link_d2e9329d4fae56000cd561128110c7bf</sys_update_name>
+        <sys_updated_by>bobby.edmonds</sys_updated_by>
+        <sys_updated_on>2016-04-02 07:05:35</sys_updated_on>
+        <tablename>sys_user</tablename>
+    </sys_metadata_link>
 </record_update>

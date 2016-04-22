@@ -9,7 +9,7 @@
             <sys_id>1b229a914fae56000cd561128110c79a</sys_id>
             <sys_mod_count>0</sys_mod_count>
             <sys_ui_formatter display_value="My Documents">d6cfc2914fae56000cd561128110c768</sys_ui_formatter>
-            <sys_ui_section caption="My Documents" display_value="My Documents" name="sys_user" sys_domain="global" view="e899d8770f611200924641fce1050e6d">a022de914fae56000cd561128110c736</sys_ui_section>
+            <sys_ui_section caption="My Documents" display_value="My Documents" name="sys_user" sys_domain="global" view="2e1412302bce06004e02af64b4da1549">a022de914fae56000cd561128110c736</sys_ui_section>
             <sys_updated_by>bobby.edmonds</sys_updated_by>
             <sys_updated_on>2016-04-02 04:08:26</sys_updated_on>
             <sys_user/>
@@ -39,7 +39,7 @@
             <sys_updated_on>2016-04-02 04:08:14</sys_updated_on>
             <sys_user/>
             <title>false</title>
-            <view display_value="Self Service" name="ess">e899d8770f611200924641fce1050e6d</view>
+            <view display_value="Self Service" name="ess">2e1412302bce06004e02af64b4da1549</view>
             <view_name/>
         </sys_ui_section>
     </sys_ui_section>

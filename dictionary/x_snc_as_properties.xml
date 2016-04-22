@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<database>
+    <element label="Properties" max_length="40" name="x_snc_as_properties" type="collection">
+        <element label="Access key" max_length="255" name="access_key" type="password2"/>
+        <element label="Bucket" max_length="63" name="bucket" type="string"/>
+        <element label="Endpoint" max_length="1024" name="endpoint" type="url"/>
+        <element label="Secret key" max_length="255" name="secret_key" type="password2"/>
+        <element label="Domain" max_length="32" name="sys_domain" type="domain_id"/>
+        <element attributes="case_sensitive=true" label="Domain Path" max_length="255" name="sys_domain_path" type="domain_path"/>
+        <index name="index">
+            <element name="sys_domain"/>
+        </index>
+    </element>
+</database>

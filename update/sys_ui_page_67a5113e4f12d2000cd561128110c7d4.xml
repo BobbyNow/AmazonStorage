@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record_update table="sys_ui_page">
+    <sys_ui_page action="INSERT_OR_UPDATE">
+        <category>general</category>
+        <client_script/>
+        <description/>
+        <direct>false</direct>
+        <endpoint>x_snc_as_s3upload_commit.do</endpoint>
+        <html><![CDATA[<?xml version="1.0" encoding="utf-8" ?>
+<j:jelly trim="false" xmlns:j="jelly:core" xmlns:g="glide" xmlns:j2="null" xmlns:g2="null">
+<g:evaluate>  
+	var docType = '&lt;!DOCTYPE HTML&gt;';  
+</g:evaluate>  
+<g2:no_escape>  
+	$[docType]  
+</g2:no_escape> 
+	
+<g2:evaluate>
+	var table = '';
+	var sysid = '';
+	
+	if ('${sysparm_abort}' == 'false') {
+		uploadMyAttachments();
+	} else if ('${sysparm_abort}' == 'true') {
+		deleteMyAttachments();
+	}
+	function uploadMyAttachments() {
+			var ur = new GlideRecord('x_snc_as_s3upload');
+			if (ur.get('${sysparm_sys_id}')) {
+//				var domain = '';
+				var canWrite = false;
+				table = ur.document_table+'';
+				sysid = ur.document_id+'';
+				var chk = new GlideRecord(table);
+				if (chk.get(ur.document_id+'')) {
+					canWrite = chk.canWrite();
+//					if (!chk.isValidField('sys_domain')) {
+//						domain = 'global';
+//					} else {
+//						domain = chk.sys_domain;
+//					}
+				}
+				
+				if (canWrite) {
+					var s3 = new AWSS3(chk);
+					s3.putFiles('${sysparm_sys_id}', '$[sysparm_folder]', '$[sysparm_create_folder]');
+				} else {
+					deleteMyAttachments();
+					gs.addErrorMessage('You do not have security permissions to upload attachments to this record.');
+				}
+			}
+	}
+	
+	function deleteMyAttachments() {
+		var ur = new GlideRecord('x_snc_as_s3upload');
+		if (ur.get('${sysparm_sys_id}')) {
+			table = ur.document_table+'';
+			sysid = ur.document_id+'';
+		}
+	    var gr = new GlideRecord('sys_attachment');
+	    gr.addQuery('table_sys_id=${sysparm_sys_id}^sys_created_by=' + gs.getUserName());
+	    gr.query();
+	
+		var sa = new GlideSysAttachment();
+	    while (gr.next()) {
+			sa.deleteAttachment(gr.sys_id);
+	    }
+	}
+	table;
+	sysid;
+</g2:evaluate>
+	<script>
+		if (typeof parent.parent.reloadS3Frame != 'undefined') {
+		  parent.parent.reloadS3Frame('$[sysparm_folder]');
+		  parent.parent.s3Managermodal.destroy();
+		} else if (parent == top) {
+			parent.window.location.href = 'x_snc_as_s3view.do?sysparm_table=$[table]$[AMP]sysparm_sys_id=$[sysid]$[AMP]sysparm_device=doctype';
+		} else {
+			top.location.reload();
+		}
+	</script>
+</j:jelly>]]></html>
+        <name>s3upload_commit</name>
+        <processing_script/>
+        <sys_class_name>sys_ui_page</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2016-03-25 05:19:45</sys_created_on>
+        <sys_customer_update>true</sys_customer_update>
+        <sys_id>67a5113e4f12d2000cd561128110c7d4</sys_id>
+        <sys_mod_count>26</sys_mod_count>
+        <sys_name>s3upload_commit</sys_name>
+        <sys_package display_value="Amazon Storage" source="x_snc_as">878fbb5e4f9a92000cd561128110c765</sys_package>
+        <sys_policy/>
+        <sys_replace_on_upgrade>false</sys_replace_on_upgrade>
+        <sys_scope display_value="Amazon Storage">878fbb5e4f9a92000cd561128110c765</sys_scope>
+        <sys_update_name>sys_ui_page_67a5113e4f12d2000cd561128110c7d4</sys_update_name>
+        <sys_updated_by>bobby.edmonds</sys_updated_by>
+        <sys_updated_on>2016-04-11 17:05:41</sys_updated_on>
+    </sys_ui_page>
+</record_update>

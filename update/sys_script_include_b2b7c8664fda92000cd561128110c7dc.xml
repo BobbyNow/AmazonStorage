@@ -1,0 +1,804 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>public</access>
+        <active>true</active>
+        <api_name>x_snc_as.AWSS3</api_name>
+        <client_callable>false</client_callable>
+        <description/>
+        <name>AWSS3</name>
+        <script><![CDATA[var AWSS3 = Class.create();
+AWSS3.prototype = {
+	initialize: function(recordObj) {
+		
+		var domain_sys_id = '';
+		
+		//If this instance does not have domain separation active default to global
+		if (!gs.getProperty('glide.sys.domain.partitioning', false)) {
+			domain_sys_id = 'global';
+		} else {
+			if (!recordObj.isValidField('sys_domain')) {
+				domain_sys_id = 'global';
+			} else {
+				domain_sys_id = recordObj.sys_domain;
+			}
+		}
+		
+		
+		this.domainConfigured = false;
+		var gr = new GlideRecord('x_snc_as_properties');
+		if (gr.get('sys_domain', domain_sys_id)) {
+			this.domainConfigured = true;
+		} else {
+			return false;
+		}
+		
+		this.aKey = gr.access_key.getDecryptedValue()+'';
+		this.sKey = gr.secret_key.getDecryptedValue()+'';
+		this.ePoint = gr.endpoint+'';
+		this.s3Bucket = gr.bucket+'';
+		this.date = this.dateString()+'';
+	},
+	
+	valid: function() {
+		//Make sure the user is authorized to use AWS S3
+		if (!gs.hasRole('x_snc_as.amazon_storage_user')) {
+			this.domainConfigured = false;
+		}
+		return this.domainConfigured;
+	},
+	
+	accessKey: function() {
+		return this.aKey+'';
+	},
+	
+	secretKey: function() {
+		return this.sKey+'';
+	},
+	
+	endPoint: function() {
+		return this.ePoint+'';
+	},
+	
+	bucket: function() {
+		return this.s3Bucket+'';
+	},
+	
+	getDate: function() {
+		return this.date+'';
+	},
+	
+	dateString: function() {
+		var request = new sn_ws.RESTMessageV2();
+		request.setHttpMethod('get');
+		request.setEndpoint(this.endPoint()+'');
+		var response = request.execute();
+		var date = response.getHeader('Date');
+		return date;
+	},
+	
+	//Not used currently
+	getBuckets: function () {
+		//Returns an array of strings that are the names of buckets
+		var authString = this._authString('', 'GET');
+		var request = new sn_ws.RESTMessageV2();
+		request.setHttpMethod('get');
+		request.setEndpoint(this.endPoint()+'');
+		request.setRequestHeader('Date', this.getDate()+'');
+		request.setRequestHeader('Authorization', authString);
+		
+		var response = request.execute();
+		var httpStatus = response.getStatusCode();
+		var resultObj = gs.xmlToJSON(response.getBody());
+		
+		var buckets = resultObj["ListAllMyBucketsResult"]["Buckets"]["Bucket"];
+		var bucketNames = [];
+		for (var i in buckets) {
+			bucketNames.push(buckets[i]["Name"]);
+		}
+		return bucketNames;
+	},
+	
+	verifyConnection: function () {
+		var js = new global.JSON();
+		var bucket = this.bucket()+'';
+		var endpoint = this.endPoint()+'';
+		var uri = bucket +'';
+		uri = uri.replace(/ /g, '+');
+		var authString = this._authString(uri, 'GET');
+		var request = new sn_ws.RESTMessageV2();
+		request.setHttpMethod('get');
+		request.setEndpoint(endpoint + '/' + bucket + '');
+		request.setRequestHeader('Date', this.getDate()+'');
+		request.setRequestHeader('Authorization', authString);
+		request.setQueryParameter('delimiter', '/');
+		var response = request.execute();
+		var httpStatus = response.getStatusCode();
+		var responseBody = (response.getBody());
+		var jsonBody = gs.xmlToJSON(responseBody);
+		var element = "'responseBody'";
+		var display = "''";
+		var statResult = 'Successful';
+		var style = 'font-weight:normal;color: black;font-size: 14px;';
+		var msg = '<div style="'+style+'">Activation '+statResult+' for <b>"'+bucket+'"</b> at endpoint <b>"'+endpoint+'"</b>!<br/>Response Status: ' + httpStatus + '<br/><br/><a onclick="var ele = gel('+element+');ele.innerHTML = JSON.stringify(JSON.parse(ele.innerHTML), undefined, 4);ele.style.display='+display+'">Show Response Body</a><pre style="display:none;" id="responseBody">' + js.encode(jsonBody) + '</pre></div>';
+		
+		if (httpStatus == 200) {
+			gs.addInfoMessage(msg);
+		} else {
+			statResult = 'Failed';
+			msg = '<div style="'+style+'">Activation '+statResult+' for <b>"'+bucket+'"</b> at endpoint <b>"'+endpoint+'"</b>!<br/>Response Status: ' + httpStatus + '<br/><br/><a onclick="var ele = gel('+element+');ele.innerHTML = JSON.stringify(JSON.parse(ele.innerHTML), undefined, 4);ele.style.display='+display+'">Show Response Body</a><pre style="display:none;" id="responseBody">' + js.encode(jsonBody) + '</pre></div>';
+			gs.addErrorMessage(msg);
+		}
+	},
+	
+	listBucket: function (prefix) {
+		var bucket = this.bucket()+'';
+		
+		var js = new global.JSON();
+		//Returns and array of strings that are the names of files in a bucket
+		var uri = bucket + '';
+		uri = uri.replace(/ /g, '+');
+		var authString = this._authString(uri, 'GET');
+		var request = new sn_ws.RESTMessageV2();
+		request.setHttpMethod('get');
+		request.setEndpoint(this.endPoint() + '/' + bucket + '');
+		request.setRequestHeader('Date', this.getDate()+'');
+		request.setRequestHeader('Authorization', authString);
+		request.setQueryParameter('delimiter', '/');
+		if (prefix) {
+			request.setQueryParameter('prefix', prefix);
+		}
+		var response = request.execute();
+		var httpStatus = response.getStatusCode();
+		var responseBody = (response.getBody());
+		if (httpStatus == 200) {
+			
+			//Create a JSON object of the response body
+			var resultObj = gs.xmlToJSON(responseBody);
+			
+			//Create an object to get the icon URLs for each file content_type
+			var iconObj = {};
+			var ir = new GlideRecord('sys_attachment_icon_rule');
+			ir.addQuery('select_icon_by=file_extension');
+			ir.query();
+			while (ir.next()) {
+				iconObj[ir.file_format_indicator+''] = ir.icon+'';
+			}
+			
+			var folders = resultObj["ListBucketResult"]["CommonPrefixes"];
+			if (folders != null && typeof folders.length == 'undefined') {
+				folders = [folders];
+			}
+			
+			var files = resultObj["ListBucketResult"]["Contents"];
+			if (files != null && typeof files.length == 'undefined') {
+				files = [files];
+			}
+			
+			var fileNames = [];
+			var regex = new RegExp(prefix);
+			
+			var folder = '';
+			for (var i in folders) {
+				folder = folders[i]["Prefix"].replace(regex, '');
+				//fileNames.push(folders[i]["Prefix"] + ':' + folder);
+				fileNames.push(folders[i]["Prefix"] + '^' + folder + '^images/cfldr_obj.gif^-^-');
+			}
+			
+			var file = ''; //File name without the path
+			var ext = ''; //File extension
+			var iconURL = ''; //URL to file icon for content_type
+			
+			
+			for (var j in files) {
+				if (files[j]["Key"] != prefix) {
+					file = files[j]["Key"].replace(regex, '');
+					ext = file.substring(file.lastIndexOf('.'), file.length).toLowerCase();
+					iconURL = 'images/icons/web_services_mapped.gifx';
+					
+					if (typeof iconObj[ext] != 'undefined') {
+						iconURL = iconObj[ext]+'';
+					}
+					fileNames.push(files[j]["Key"] + '^' + file + '^' + iconURL + '^' + files[j]["LastModified"] + '^' + files[j]["Size"]);
+				}
+			}
+			
+			return fileNames;
+		} else {
+			return '';
+		}
+	},
+	
+	fileVersions: function (prefix) {
+		var bucket = this.bucket()+'';
+		//Need to adjust the array nmes to support versions before allowing it
+		versions = true;
+		
+		var js = new global.JSON();
+		//Returns and array of strings that are the names of files in a bucket
+		var uri = bucket + '';
+		if (versions) {
+			uri = uri + '/?versions';
+			bucket = bucket + '/';
+		}
+		uri = uri.replace(/ /g, '+');
+		var authString = this._authString(uri, 'GET');
+		var request = new sn_ws.RESTMessageV2();
+		request.setHttpMethod('get');
+		request.setEndpoint(this.endPoint() + '/' + bucket + '');
+		request.setRequestHeader('Date', this.getDate()+'');
+		request.setRequestHeader('Authorization', authString);
+		if (versions) {
+			request.setQueryParameter('versions', '');
+		}
+		request.setQueryParameter('delimiter', '/');
+		if (prefix) {
+			request.setQueryParameter('prefix', prefix);
+		}
+		var response = request.execute();
+		var httpStatus = response.getStatusCode();
+		var responseBody = (response.getBody());
+		if (httpStatus == 200) {
+			
+			//Create a JSON object of the response body
+			var resultObj = gs.xmlToJSON(responseBody);
+			var files = resultObj["ListVersionsResult"]["Version"];
+			if (files != null && typeof files.length == 'undefined') {
+				files = [files];
+			}
+			var fileVersions = [];
+			var isLatest = '';
+			var lastModified = '';
+			var versionId = '';
+			
+			for (var j in files) {
+				isLatest = files[j]["IsLatest"]+'';
+				
+				if (isLatest == 'false') {
+					lastModified = files[j]["LastModified"]+'';
+					versionId = files[j]["VersionId"]+'';
+					fileVersions.push(versionId + '^' + lastModified);
+				}
+			}
+			
+			return fileVersions;
+		} else {
+			return '';
+		}
+	},
+	
+	getFile: function (filePath, versionId) {
+		var bucket = this.bucket()+'';
+		//Returns a string that is the URL of a file with auth signature attached so it is valid
+		//response-content-disposition=attachment%3B%20filename%3Dput.txt&response-content-encoding=binary&
+		filePath = filePath.replace(/ /g, '+');
+		var uri = this.bucket() + '/' + filePath;
+		
+		if (versionId) {
+			uri = uri + '?response-content-type=application/octet-stream' + '&versionId=' + versionId;
+		} else {
+			uri = uri + '?response-content-type=application/octet-stream';
+		}
+		uri = uri.replace(/ /g, '+');
+		var expires = this._timeOut(new Date(), '15');
+		var stringToSign = 'GET\n\n\n' + expires + '\n/' + uri;
+		var signature = this.s3Authentication(stringToSign, this.secretKey()+'');
+		return this._genLink(filePath, encodeURIComponent(signature), expires, versionId);
+	},
+	
+	//USED BY this.getFile()
+	_genLink: function(filePath, sig, expires, versionId) {
+		var url = "https://"+this.bucket()+".s3.amazonaws.com/"+ filePath +
+		"?response-content-type=application/octet-stream" +
+		"&AWSAccessKeyId=" + this.accessKey() +
+		"&Expires="+ expires +
+		"&Signature=" + sig;
+		if (versionId) {
+			url = url + "&versionId="+ versionId;
+		}
+		return url;
+	},
+	
+	putFiles: function (s3upload_id, folder, createFolder) {
+		var bucket = this.bucket()+'';
+		//Get the s3upload record
+		var gr = new GlideRecord('x_snc_as_s3upload');
+		if (!gr.get(s3upload_id)) {
+			return 's3Upload record not found';
+		}
+		
+		//If you cannot write to the source record you cannot upload files
+		if (!gr.document_id.canWrite()) {
+			return false;
+		}
+		
+		var att = new GlideRecord('sys_attachment');
+		att.addQuery('table_sys_id=' + s3upload_id);
+		att.addQuery('sys_created_by=' + gs.getUserName());
+		att.query();
+		while (att.next()) {
+			this.putFile(att.sys_id, gr.document_table, gr.document_id, gr.sys_id, folder);
+		}
+		
+		if (folder && createFolder) {
+			this.putFolders(folder, createFolder);
+		}
+	},
+	
+	putFolders: function (folder, createFolder) {
+		var dirArr = createFolder.split(',');
+		var subFolder = '';
+		var subdirArr = [];
+		var subdir = '';
+		var dir = '';
+		var path = '';
+		var fldr = '';
+		var finalArr = [];
+		
+		
+		for (var i = 0; i < dirArr.length; i++) {
+			dir = dirArr[i]+'';
+			subdirArr = dir.split('^').reverse();
+			path = subdirArr.pop()+'';
+			if (path.endsWith('/')) {
+				fldr = path.substring(0, path.length-1)+'';
+			} else {
+				fldr = path.substring(0, path.lastIndexOf('/')+1)+'';
+			}
+			subFolder = path.substring(path.lastIndexOf('/')+1, path.length)+'';
+			subdirArr.push(subFolder);
+			for (var j = 0; j < subdirArr.length; j++) {
+				subdir = subdirArr[j]+'';
+				finalArr.push(fldr + subdir + '');
+			}
+		}
+		for (var k = 0; k < finalArr.length; k++) {
+			this.putFolder(folder, finalArr[k]+'');
+		}
+	},
+	
+	putFolder: function (folder, createFolder) {
+		//Make sure there are no spaces
+		createFolder = createFolder.replace(/ /g, '+');
+		
+		var uri = this.bucket() + '/' + folder + createFolder+'';
+		if (!uri.endsWith('/')) {
+			uri = uri + '/';
+		}
+		uri = uri.replace(/ /g, '+');
+		var authString = this._authString(uri, 'PUT');
+		var request = new sn_ws.RESTMessageV2();
+		request.setHttpMethod('put');
+		request.setEndpoint(this.endPoint() + '/' + uri);
+		request.setRequestHeader('Date', this.getDate()+'');
+		request.setRequestHeader('Authorization', authString);
+		
+		var response = request.execute();
+		var responseBody = response.getBody();
+		var httpStatus = response.getStatusCode();
+		//var json = gs.xmlToJSON(responseBody);
+		//var js = new global.JSON();
+		//gs.info('putFolder - responseBody: ' + js.encode(json));
+		
+	},
+	
+	putFile: function (att_id, table, sysid, s3upload_id, folder) {
+		var bucket = this.bucket()+'';
+		
+		var js = new global.JSON();
+		var filePath = '';
+		
+		//Uploads an attachment in SNC to AWS S3 into a specified bucket
+		var attGR = new GlideRecord('sys_attachment');
+		if (!attGR.get(att_id)) {
+			return 'No Attachment Found for sys_id=' + att_id + '.';
+		}
+		
+		filePath = attGR.file_name+'';
+		filePath = filePath.replace(/ /g, '+')+'';
+		filePath = filePath.replace(/(")|(')|(%22)|(%27)/g, '')+'';
+		
+		if (folder) {
+			filePath = folder + filePath+'';
+		} else {
+			filePath = table + '/' + sysid + '/' + filePath;
+		}
+		
+		var uri = bucket + '/' + filePath;
+		uri = uri.replace(/ /g, '+');
+		var authString = this._authString(uri, 'PUT');
+		var request = new sn_ws.RESTMessageV2();
+		request.setHttpMethod('put');
+		request.setEndpoint(this.endPoint() + '/' + uri);
+		request.setRequestHeader('Date', this.getDate()+'');
+		request.setRequestHeader('Authorization', authString);
+		request.setRequestHeader('Content-Length', attGR.size_bytes);
+		request.setRequestBodyFromAttachment(att_id);
+		
+		var response = request.execute();
+		var responseBody = response.getBody();
+		var httpStatus = response.getStatusCode();
+		
+		
+		if (httpStatus == 200) {
+			var sa = new GlideSysAttachment();
+			sa.deleteAttachment(att_id);
+		} else {
+			gs.addErrorMessage('httpStatus: ' + httpStatus + '<br/>responseBody:<br/>' + responseBody.replace(/\\n/g, '<br/>'));
+		}
+		
+		var strg = 'httpStatus: '+js.encode(httpStatus) + '\n responseBody: ' + js.encode(responseBody) + '\n response: ' + js.encode(response);
+		return strg;
+	},
+	
+	//Delete the file on S3
+	delFile: function(table, sys_id, file, folder) {
+		var pathToKeep = folder+'';
+		var bucket = this.bucket()+'';
+		var filePath = '';
+		if (folder) {
+			filePath = folder + file.replace(/ /g, '+');
+		} else {
+			filePath = table + '/' + sys_id + '/' + file.replace(/ /g, '+');
+		}
+		
+		var uri = bucket + '/' + filePath;
+		uri = uri.replace(/ /g, '+');
+		var authString = this._authString(uri, 'DELETE');
+		
+		var request = new sn_ws.RESTMessageV2();
+		request.setHttpMethod('delete');
+		request.setEndpoint(this.endPoint() + '/' + uri);
+		request.setRequestHeader('Date', this.getDate()+'');
+		request.setRequestHeader('Authorization', authString);
+		request.setStringParameter('contentLength', '0');
+		
+		var response = request.execute();
+		var responseBody = response.getBody();
+		var httpStatus = response.getStatusCode();
+		
+		//Make sure the folder structure above stays intact
+		if (httpStatus == 204 && file.endsWith('/')) {
+			this.putFolder(pathToKeep, '');
+		}
+		
+		return httpStatus;
+	},
+	
+	//Generates the authStrings for all file actions
+	_authString: function (uri, method) {
+		var authString = 'AWS ' + this.accessKey() + ':' + this._signature(uri, method);
+		return authString;
+	},
+	
+	//Called by this._authString()
+	_signature: function (uri, method) {
+		var stringToSign = method + '\n\n\n' + this.getDate() + '\n/' + uri;
+		var signature = this.s3Authentication(stringToSign, this.secretKey()+'');
+		return signature;
+	},
+	
+	//USED FOR expires in this.getFile()
+	_timeOut: function(date, minutes) {
+		var epoch = new Date(date.getTime() + minutes*60000).getTime();
+		return parseInt(epoch/1000);
+	},
+	
+	s3Authentication: function(stringToSign, secretKey) {
+		var CryptoJS = CryptoJS || function (i, j) {
+			var f = {}
+			, b = f.lib = {}
+			, m = b.Base = function () {
+				function a() {}
+				return {
+					extend: function (e) {
+						a.prototype = this;
+						var c = new a;
+						!gs.nil(e) && c.mixIn(e);
+						c.$super = this;
+						return c
+					}
+					, create: function () {
+						var a = this.extend();
+						a.init.apply(a, arguments);
+						return a
+					}
+					, init: function () {}
+					, mixIn: function (a) {
+						for (var c in a) a.hasOwnProperty(c) && (this[c] = a[c]);
+							a.hasOwnProperty("toString") && (this.toString = a.toString)
+					}
+					, clone: function () {
+						return this.$super.extend(this)
+					}
+				}
+			}()
+			, l = b.WordArray = m.extend({
+				init: function (a, e) {
+					a =
+					this.words = a || [];
+					this.sigBytes = e != j ? e : 4 * a.length
+				}
+				, toString: function (a) {
+					return (a || d)
+					.stringify(this)
+				}
+				, concat: function (a) {
+					var e = this.words
+					, c = a.words
+					, o = this.sigBytes
+					, a = a.sigBytes;
+					this.clamp();
+					if (o % 4)
+						for (var b = 0; b < a; b++) e[o + b >>> 2] |= (c[b >>> 2] >>> 24 - 8 * (b % 4) & 255) << 24 - 8 * ((o + b) % 4);
+						else if (65535 < c.length)
+						for (b = 0; b < a; b += 4) e[o + b >>> 2] = c[b >>> 2];
+						else e.push.apply(e, c);
+						this.sigBytes += a;
+					return this
+				}
+				, clamp: function () {
+					var a = this.words
+					, e = this.sigBytes;
+					a[e >>> 2] &= 4294967295 << 32 - 8 * (e % 4);
+					a.length = i.ceil(e / 4)
+				}
+				, clone: function () {
+					var a =
+					m.clone.call(this);
+					a.words = this.words.slice(0);
+					return a
+				}
+				, random: function (a) {
+					for (var e = [], c = 0; c < a; c += 4) e.push(4294967296 * i.random() | 0);
+						return l.create(e, a)
+				}
+			})
+			, n = f.enc = {}
+			, d = n.Hex = {
+				stringify: function (a) {
+					for (var e = a.words, a = a.sigBytes, c = [], b = 0; b < a; b++) {
+						var d = e[b >>> 2] >>> 24 - 8 * (b % 4) & 255;
+						c.push((d >>> 4)
+						.toString(16));
+						c.push((d & 15)
+						.toString(16))
+					}
+					return c.join("")
+				}
+				, parse: function (a) {
+					for (var e = a.length, c = [], b = 0; b < e; b += 2) c[b >>> 3] |= parseInt(a.substr(b, 2), 16) << 24 - 4 * (b % 8);
+						return l.create(c, e / 2)
+				}
+			}
+			, h = n.Latin1 = {
+				stringify: function (a) {
+					for (var e =
+						a.words, a = a.sigBytes, b = [], d = 0; d < a; d++) b.push(String.fromCharCode(e[d >>> 2] >>> 24 - 8 * (d % 4) & 255));
+					return b.join("")
+				}
+				, parse: function (a) {
+					for (var b = a.length, c = [], d = 0; d < b; d++) c[d >>> 2] |= (a.charCodeAt(d) & 255) << 24 - 8 * (d % 4);
+						return l.create(c, b)
+				}
+			}
+			, k = n.Utf8 = {
+				stringify: function (a) {
+					try {
+						return decodeURIComponent(escape(h.stringify(a)))
+					} catch (b) {
+						throw Error("Malformed UTF-8 data");
+					}
+				}
+				, parse: function (a) {
+					return h.parse(unescape(encodeURIComponent(a)))
+				}
+			}
+			, g = b.BufferedBlockAlgorithm = m.extend({
+				reset: function () {
+					this._data = l.create();
+					this._nDataBytes = 0
+				}
+				, _append: function (a) {
+					"string" == typeof a && (a = k.parse(a));
+					this._data.concat(a);
+					this._nDataBytes += a.sigBytes
+				}
+				, _process: function (a) {
+					var b = this._data
+					, c = b.words
+					, d = b.sigBytes
+					, f = this.blockSize
+					, g = d / (4 * f)
+					, g = a ? i.ceil(g) : i.max((g | 0) - this._minBufferSize, 0)
+					, a = g * f
+					, d = i.min(4 * a, d);
+					if (a) {
+						for (var h = 0; h < a; h += f) this._doProcessBlock(c, h);
+							h = c.splice(0, a);
+						b.sigBytes -= d
+					}
+					return l.create(h, d)
+				}
+				, clone: function () {
+					var a = m.clone.call(this);
+					a._data = this._data.clone();
+					return a
+				}
+				, _minBufferSize: 0
+			});
+			b.Hasher = g.extend({
+				init: function () {
+					this.reset()
+				}
+				, reset: function () {
+					g.reset.call(this);
+					this._doReset()
+				}
+				, update: function (a) {
+					this._append(a);
+					this._process();
+					return this
+				}
+				, finalize: function (a) {
+					a && this._append(a);
+					this._doFinalize();
+					return this._hash
+				}
+				, clone: function () {
+					var a = g.clone.call(this);
+					a._hash = this._hash.clone();
+					return a
+				}
+				, blockSize: 16
+				, _createHelper: function (a) {
+					return function (b, c) {
+						return a.create(c)
+						.finalize(b)
+					}
+				}
+				, _createHmacHelper: function (a) {
+					return function (b, c) {
+						return p.HMAC.create(a, c)
+						.finalize(b)
+					}
+				}
+			});
+			var p = f.algo = {};
+			return f
+		}(Math);
+		(function () {
+			var i = CryptoJS
+			, j = i.lib
+			, f = j.WordArray
+			, j = j.Hasher
+			, b = []
+			, m = i.algo.SHA1 = j.extend({
+				_doReset: function () {
+					this._hash = f.create([1732584193, 4023233417, 2562383102, 271733878, 3285377520])
+				}
+				, _doProcessBlock: function (f, i) {
+					for (var d = this._hash.words, h = d[0], k = d[1], g = d[2], j = d[3], a = d[4], e = 0; 80 > e; e++) {
+						if (16 > e) b[e] = f[i + e] | 0;
+							else {
+							var c = b[e - 3] ^ b[e - 8] ^ b[e - 14] ^ b[e - 16];
+							b[e] = c << 1 | c >>> 31
+						}
+						c = (h << 5 | h >>> 27) + a + b[e];
+						c = 20 > e ? c + ((k & g | ~k & j) + 1518500249) : 40 > e ? c + ((k ^ g ^ j) + 1859775393) : 60 > e ? c + ((k & g | k & j | g & j) - 1894007588) : c + ((k ^ g ^ j) -
+						899497514);
+						a = j;
+						j = g;
+						g = k << 30 | k >>> 2;
+						k = h;
+						h = c
+					}
+					d[0] = d[0] + h | 0;
+					d[1] = d[1] + k | 0;
+					d[2] = d[2] + g | 0;
+					d[3] = d[3] + j | 0;
+					d[4] = d[4] + a | 0
+				}
+				, _doFinalize: function () {
+					var b = this._data
+					, f = b.words
+					, d = 8 * this._nDataBytes
+					, h = 8 * b.sigBytes;
+					f[h >>> 5] |= 128 << 24 - h % 32;
+					f[(h + 64 >>> 9 << 4) + 15] = d;
+					b.sigBytes = 4 * f.length;
+					this._process()
+				}
+			});
+			i.SHA1 = j._createHelper(m);
+			i.HmacSHA1 = j._createHmacHelper(m)
+		})();
+		(function () {
+			var i = CryptoJS
+			, j = i.enc.Utf8;
+			i.algo.HMAC = i.lib.Base.extend({
+				init: function (f, b) {
+					f = this._hasher = f.create();
+					"string" == typeof b && (b = j.parse(b));
+					var i = f.blockSize
+					, l = 4 * i;
+					b.sigBytes > l && (b = f.finalize(b));
+					for (var n = this._oKey = b.clone(), d = this._iKey = b.clone(), h = n.words, k = d.words, g = 0; g < i; g++) h[g] ^= 1549556828, k[g] ^= 909522486;
+						n.sigBytes = d.sigBytes = l;
+					this.reset()
+				}
+				, reset: function () {
+					var f = this._hasher;
+					f.reset();
+					f.update(this._iKey)
+				}
+				, update: function (f) {
+					this._hasher.update(f);
+					return this
+				}
+				, finalize: function (f) {
+					var b =
+					this._hasher
+					, f = b.finalize(f);
+					b.reset();
+					return b.finalize(this._oKey.clone()
+					.concat(f))
+				}
+			})
+		})();
+		(function () {
+			var h = CryptoJS
+			, i = h.lib.WordArray;
+			h.enc.Base64 = {
+				stringify: function (b) {
+					var e = b.words
+					, f = b.sigBytes
+					, c = this._map;
+					b.clamp();
+					for (var b = [], a = 0; a < f; a += 3)
+						for (var d = (e[a >>> 2] >>> 24 - 8 * (a % 4) & 255) << 16 | (e[a + 1 >>> 2] >>> 24 - 8 * ((a + 1) % 4) & 255) << 8 | e[a + 2 >>> 2] >>> 24 - 8 * ((a + 2) % 4) & 255, g = 0; 4 > g && a + 0.75 * g < f; g++) b.push(c.charAt(d >>> 6 * (3 - g) & 63));
+						if (e = c.charAt(64))
+						for (; b.length % 4;) b.push(e);
+						return b.join("")
+				}
+				, parse: function (b) {
+					var b = b.replace(/\s/g, "")
+					, e = b.length
+					, f = this._map
+					, c = f.charAt(64);
+					c && (c = b.indexOf(c), -1 != c && (e = c));
+					for (var c = [], a = 0, d = 0; d < e; d++)
+						if (d % 4) {
+						var g = f.indexOf(b.charAt(d - 1)) << 2 * (d % 4)
+						, h = f.indexOf(b.charAt(d)) >>> 6 - 2 * (d % 4);
+						c[a >>> 2] |= (g | h) << 24 - 8 * (a % 4);
+						a++
+					}
+					return i.create(c, a)
+				}
+				, _map: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/="
+			}
+		})();
+		
+		return CryptoJS.HmacSHA1(stringToSign, this.secretKey()+'').toString(CryptoJS.enc.Base64);
+		
+	},
+	
+	type: 'AWSS3'
+};]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2016-03-24 05:02:05</sys_created_on>
+        <sys_customer_update>true</sys_customer_update>
+        <sys_id>b2b7c8664fda92000cd561128110c7dc</sys_id>
+        <sys_mod_count>259</sys_mod_count>
+        <sys_name>AWSS3</sys_name>
+        <sys_package display_value="Amazon Storage" source="x_snc_as">878fbb5e4f9a92000cd561128110c765</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_replace_on_upgrade>false</sys_replace_on_upgrade>
+        <sys_scope display_value="Amazon Storage">878fbb5e4f9a92000cd561128110c765</sys_scope>
+        <sys_update_name>sys_script_include_b2b7c8664fda92000cd561128110c7dc</sys_update_name>
+        <sys_updated_by>bobby.edmonds</sys_updated_by>
+        <sys_updated_on>2016-04-14 15:50:13</sys_updated_on>
+    </sys_script_include>
+</record_update>

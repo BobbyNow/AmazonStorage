@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record_update table="sys_ui_macro">
+    <sys_ui_macro action="INSERT_OR_UPDATE">
+        <active>true</active>
+        <category>general</category>
+        <description/>
+        <media_type/>
+        <name>s3view</name>
+        <scoped_name>x_snc_as_s3view</scoped_name>
+        <sys_class_name>sys_ui_macro</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2016-03-25 05:18:47</sys_created_on>
+        <sys_customer_update>true</sys_customer_update>
+        <sys_id>6485993e4f12d2000cd561128110c76a</sys_id>
+        <sys_mod_count>25</sys_mod_count>
+        <sys_name>s3view</sys_name>
+        <sys_package display_value="Amazon Storage" source="x_snc_as">878fbb5e4f9a92000cd561128110c765</sys_package>
+        <sys_policy/>
+        <sys_replace_on_upgrade>false</sys_replace_on_upgrade>
+        <sys_scope display_value="Amazon Storage">878fbb5e4f9a92000cd561128110c765</sys_scope>
+        <sys_update_name>sys_ui_macro_6485993e4f12d2000cd561128110c76a</sys_update_name>
+        <sys_updated_by>bobby.edmonds</sys_updated_by>
+        <sys_updated_on>2016-04-02 04:12:28</sys_updated_on>
+        <xml><![CDATA[<?xml version="1.0" encoding="utf-8" ?>
+<j:jelly trim="false" xmlns:j="jelly:core" xmlns:g="glide" xmlns:j2="null" xmlns:g2="null">
+	<g2:evaluate>
+var table = current.getTableName();
+var sysid = current.sys_id;
+</g2:evaluate>
+<iframe id="s3ViewFrame" onload="setIframeHeight(this.id)" frameborder="0" scrolling="no" style="width: 100%;" src="x_snc_as_s3view.do?sysparm_table=$[table]&amp;sysparm_sys_id=$[sysid]"/>
+<script language="javascript" type="text/javascript">
+	function getDocHeight(doc) {
+		doc = doc || document;
+		// stackoverflow.com/questions/1145850/
+		var body = doc.body, html = doc.documentElement;
+		var height = Math.max( body.scrollHeight, body.offsetHeight, 
+			html.clientHeight, html.scrollHeight, html.offsetHeight );
+		return height;
+	}
+	
+	function setIframeHeight(id) {
+		var ifrm = document.getElementById(id);
+		var doc = ifrm.contentDocument? ifrm.contentDocument: 
+			ifrm.contentWindow.document;
+		ifrm.style.visibility = 'hidden';
+		ifrm.style.height = "600px"; // reset to minimal height ...
+		// IE opt. for bing/msn needs a bit added or scrollbar appears
+		ifrm.style.height = getDocHeight( doc ) + 4 + "px";
+		ifrm.style.visibility = 'visible';
+	}
+
+	function reloadS3Frame(url) {
+		var frame = gel('s3ViewFrame');
+	    var doc = frame.contentDocument? frame.contentDocument:frame.contentWindow.document;
+		doc.location.reload();
+	}
+</script>
+</j:jelly>]]></xml>
+    </sys_ui_macro>
+</record_update>

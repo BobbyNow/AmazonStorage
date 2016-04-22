@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record_update table="sys_app">
+    <sys_app action="INSERT_OR_UPDATE">
+        <active>true</active>
+        <enforce_license>log</enforce_license>
+        <js_level/>
+        <licensable>true</licensable>
+        <logo/>
+        <menu display_value="Amazon S3">4d6088aa4f9a92000cd561128110c7ba</menu>
+        <name>Amazon Storage</name>
+        <private>false</private>
+        <restrict_table_access>false</restrict_table_access>
+        <runtime_access_tracking/>
+        <scope>x_snc_as</scope>
+        <scoped_administration>false</scoped_administration>
+        <short_description>Attachment Storage Integration with Amazon S3</short_description>
+        <source>x_snc_as</source>
+        <store_correlation_id/>
+        <store_url/>
+        <sys_class_name>sys_app</sys_class_name>
+        <sys_code/>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2016-03-24 04:24:31</sys_created_on>
+        <sys_id>878fbb5e4f9a92000cd561128110c765</sys_id>
+        <sys_mod_count>4</sys_mod_count>
+        <sys_updated_by>bobby.edmonds</sys_updated_by>
+        <sys_updated_on>2016-04-22 16:41:29</sys_updated_on>
+        <template/>
+        <trackable>true</trackable>
+        <user_role/>
+        <vendor/>
+        <vendor_prefix/>
+        <version>1.2</version>
+    </sys_app>
+</record_update>

@@ -1,0 +1,446 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record_update table="sys_ui_page">
+    <sys_ui_page action="INSERT_OR_UPDATE">
+        <category>general</category>
+        <client_script><![CDATA[//addLoadEvent(chkForm);
+
+// function chkForm() {
+	// 	if (mobileAndTabletcheck()) {
+		// 		gel('uploadButton').style.display = 'none';
+		// 		gel('deleteButton').style.display = 'none';
+		// 	}
+		// }
+		
+		function mobileAndTabletcheck() {
+			var check = false;
+			(function(a){
+				if(/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows ce|xda|xiino|android|ipad|playbook|silk/i.test(a)||/1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i.test(a.substr(0,4)))check = true
+				})(navigator.userAgent||navigator.vendor||window.opera);
+			return check;
+		}
+		
+		function s3FrameWorks(src) {
+			if (mobileAndTabletcheck()) {
+				location.href = src;
+			} else {
+				var frame = gel('s3FrameWorks');
+				frame.src = src;
+			}
+		}
+		
+		function toggleDeleteFiles(aID) {
+			var img = gel(aID);
+			var td = img.style.textDecoration+'';
+			if (td == 'line-through') {
+				img.style.textDecoration = '';
+				img.style.color = '';
+			} else {
+				img.style.textDecoration = 'line-through';
+				img.style.color = 'red';
+			}
+		}
+		
+		function deleteFiles() {
+			var files = [];
+			var list = chkDelete();
+			for (var i in list) {
+				files.push(list[i]+'');
+			}
+			manageFileDeletions(JSON.stringify(files));
+		}
+		
+		function deleteFilesMode() {
+			var delButton = gel('deleteButton');
+			var deleteMode = delButton.innerHTML == 'Delete Files' ? true : false;
+			
+			var icoType = document.getElementById('browse-files').getElementsByClassName('icoType');
+			var icoDelete = document.getElementById('browse-files').getElementsByClassName('icoDelete');
+			for (var i in icoType) {
+				if (icoType[i] && icoType[i].style ) {
+					icoType[i].style.display = deleteMode ? 'none' : 'inline';
+				}
+			}
+			for (var j in icoDelete) {
+				if (icoDelete[j] && icoDelete[j].style) {
+					icoDelete[j].style.display = deleteMode ? 'inline' : 'none';
+				}
+			}
+			if(deleteMode) {
+				gel('deleteButton').className = 'btn btn-primary';
+				gel('deleteCommitButton').style.display = '';
+			} else {
+				var list = chkDelete();
+				for (var k in list) {
+					gel(k).style.textDecoration = '';
+					gel(k).style.color = '';
+				}
+				gel('deleteButton').className = 'btn btn-default';
+				gel('deleteCommitButton').style.display = 'none';
+			}
+			delButton.innerHTML = delButton.innerHTML == 'Delete Files' ? 'Cancel Delete' : 'Delete Files';
+		}
+		
+		function chkDelete() {
+			var filesToDelete = false;
+			var files = document.getElementById('browse-files').getElementsByClassName('filename-link');
+			var list = {};
+			for (var i in files) {
+				if (files[i].style && files[i].style.textDecoration == 'line-through') {
+					list[files[i].id] = files[i].innerHTML+'';
+					filesToDelete = true;
+				}
+			}
+			if (filesToDelete) {
+				return list;
+			} else {
+				return false;
+			}
+		}
+		
+		function manageFiles() {
+			var ajax = new GlideAjax('AWSS3ClientUtil');
+			ajax.addParam("sysparm_name", "uploadFiles");
+			ajax.addParam("sysparm_sysid", gel('sys_id').value);
+			ajax.addParam("sysparm_table", gel('table_name').value);
+			ajax.getXML(manageFilesCallBack);
+		}
+		
+		function manageFilesCallBack(response) {
+			var xml = response.responseXML;
+			var element = xml.documentElement;
+			var answer = element.getAttribute("answer");
+			if (typeof parent.g_form == 'undefined') {
+				window.location.href = 'x_snc_as_s3upload.do?sys_id=' + answer + '&sysparm_device=doctype';
+				return;
+			}
+			parent.s3Managermodal = new parent.GlideModalForm('Amazon Storage', 'x_snc_as_s3upload');
+			parent.s3Managermodal.setSysID(answer);
+			parent.s3Managermodal.setPreferenceAndReload({'sysparm_titleless':'false','sysparm_back':gel('back_url').value,'sysparm_folder':gel('file_path').value});
+			parent.s3Managermodal.render();
+		}
+		
+		function manageFileDeletions(list) {
+			var ajax = new GlideAjax('AWSS3ClientUtil');
+			ajax.addParam("sysparm_name", "deleteFiles");
+			ajax.addParam("sysparm_sysid", gel('sys_id').value);
+			ajax.addParam("sysparm_table", gel('table_name').value);
+			ajax.addParam("sysparm_folder", gel('file_path').value);
+			ajax.addParam("sysparm_list", list);
+			ajax.getXML(manageFileDeletionsCallBack);
+		}
+		
+		function manageFileDeletionsCallBack(response) {
+			location.reload();
+		}
+		]]></client_script>
+        <description>&#13;
+	</description>
+        <direct>false</direct>
+        <endpoint>x_snc_as_s3view.do</endpoint>
+        <html><![CDATA[<?xml version="1.0" encoding="utf-8" ?>
+<j:jelly trim="false" xmlns:j="jelly:core" xmlns:g="glide" xmlns:j2="null" xmlns:g2="null">
+<g:evaluate>  
+	var docType = '&lt;!DOCTYPE HTML&gt;';  
+</g:evaluate>  
+<g2:no_escape>  
+	$[docType]  
+</g2:no_escape> 
+
+<link href="02fab9344fb65a000cd561128110c797.cssdbx?v=${new Date().getTime()}" type="text/css" rel="stylesheet"/>
+
+<g2:evaluate>
+	var filePath = "${sysparm_file}";
+	if (filePath) {
+		var table = filePath.split('/')[0]+'';
+		var sysid = filePath.split('/')[1]+'';
+	} else {
+		var table = "${sysparm_table}";
+		var sysid = "${sysparm_sys_id}";
+	
+		//Personal file store shortcut
+		var myDocs = false;
+		if (table == '' || table == 'sys_user') {
+			table = 'sys_user';
+			myDocs = true;
+			if (sysid == '') {
+				sysid = gs.getUserID()+'';
+			}
+		}
+	
+		filePath = table + '/' + sysid + '/';
+	}
+	
+	var pathStr = table + '\/' + sysid + '\/';
+	var regEx = new RegExp(pathStr);
+	var path = filePath.replace(regEx, '');
+	
+	var backURL = "";
+	if (filePath != table + '/' + sysid + '/') {
+		var backArr = filePath.split('/');
+		for (var i = 0;i &lt; backArr.length-2;i++) {
+			backURL += backArr[i] + '/';
+		}
+	}
+	
+	var canRead = false;
+	var canDelete = false;
+
+	var chk = new GlideRecord(table);
+	if (chk.get(sysid)) {
+	
+		canRead = chk.canRead();
+	
+		//If you can write to the record then you can add/delete attachments
+		canDelete = chk.canWrite();
+	}
+	
+	var s3 = new AWSS3(chk);
+	if (!s3.valid()) {
+		canRead = false;
+	}
+	
+	//Personal file stores are personal
+	if (table == 'sys_user') {
+		if (sysid != gs.getUserID()) {
+			canRead = false;
+		}
+	}
+	
+	if (canRead) {
+		var bucket = s3.bucket()+'';
+		var data = [];
+		var href = '';
+		var file = 'false';
+
+		//This is a folder, list its contents
+		if (filePath != '' $[AMP]$[AMP] bucket != '' $[AMP]$[AMP] filePath.toString().endsWith('/')) {
+			data = s3.listBucket(filePath);
+			href = 'x_snc_as_s3view.do?sysparm_bucket=' + bucket + '&amp;sysparm_file=';
+		}
+
+		//This is a file, generate a URL to download it
+		else if (filePath != '' $[AMP]$[AMP] bucket != '') {
+			data = s3.getFile(filePath, '${sysparm_version}');
+			file = 'true';
+		}
+
+		//This is a bucket, list its contents
+		else if (bucket != '') {
+			data = s3.listBucket();
+			href = 'x_snc_as_s3view.do?sysparm_bucket=' + bucket + '&amp;sysparm_file=';
+		}
+
+		//This is a list of buckets
+		else {
+			data = s3.getBuckets();
+			href = 'x_snc_as_s3view.do?sysparm_bucket=';
+			back = '';
+		}
+	}
+</g2:evaluate>
+<j2:if test="$[myDocs]">
+	<script>
+		if (top == self) {
+			document.title = '${gs.getMessage("My Documents")}';
+		}
+	</script>
+</j2:if>
+	
+<j2:if test="$[!canRead]">
+	<script>
+		addLoadEvent(hideAmazonStorageFormSection);
+		function hideAmazonStorageFormSection() {
+			if (parent $[AMP]$[AMP] parent.g_form) {
+				parent.g_form.setSectionDisplay('amazon_storage', false);
+				parent.g_form.setSectionDisplay('my_documents', false);
+			}
+		}
+	</script>
+</j2:if>
+	
+<j2:if test="$[canRead]">
+	
+	<input id="sys_id" type="hidden" value="$[sysid]"/>
+	<input id="table_name" type="hidden" value="$[table]"/>
+	<input id="back_url" type="hidden" value="$[backURL]"/>
+	<input id="file_path" type="hidden" value="$[filePath]"/>
+	
+	<j2:if test="$[file == 'true']">
+		<META http-equiv="refresh" content="0;URL=$[data]"/>
+		</j2:if>
+		<j2:if test="$[file == 'false']">
+			<j2:if test="$[backURL != '']">
+				<div style="font-size:15px" id="browse-sort" class="clearfix ">
+					<span style="cursor: default;float:left;width:100%;">$[path]</span>
+				</div>
+			</j2:if>
+			
+			<div style="font-size:20px" id="browse-sort" class="clearfix ">
+				<span style="cursor: default;float:left;width:42%;">Name</span>
+				<span style="cursor: default;float:left;width:20%;">Modified</span>
+				<span style="cursor: default;float:left;width:15%;">Size</span>
+				<span style="cursor: default;width:20%;">Version</span>
+			</div>
+
+			<ol id="browse-files" style="cursor: default;" class="mouse-active">
+
+			<j2:forEach items="$[data]" var="jvar_data">
+
+				<g2:evaluate jelly="true">
+					var data = jelly.jvar_data.split('^');
+					var iconURL = '';
+					var iconDelURL = '';
+					var lastModified = '';
+					var size = '';
+					var folder = 'false';
+					var back = '';
+
+					var dataName = data[0]+'';
+					if (data[1]) {
+						dataName = data[1]+'';
+					}
+					
+					if (dataName.toString().endsWith('/')) {
+						folder = 'true';
+					}
+					
+					if (data[2]) {
+					    var src = data[2]+'';
+						var uID = gs.generateGUID()+'';
+						var aID = "'" + uID + "'";
+					
+						iconURL = '&lt;img id="img_' + uID + '" class="icoType" style="margin:0px 2px 0px 0px;" src="' + src + '"/&gt;';
+					
+						if (canDelete) {
+							iconDelURL = '&lt;img id="del_' + uID + '" onclick="toggleDeleteFiles('+aID+')" class="icoDelete" style="display: none; margin:0px 2px 0px 0px;" src="images/delete_row.gifx"/&gt;';
+						}
+					
+					/*
+						if (canDelete $[AMP]$[AMP] folder == 'false') {
+							iconDelURL = '&lt;img id="del_' + uID + '" onclick="toggleDeleteFiles('+aID+')" class="icoDelete" style="display: none; margin:0px 2px 0px 0px;" src="images/delete_row.gifx"/&gt;';
+						} else {
+							iconDelURL = '&lt;img id="del_' + uID + '" class="icoDelete" style="display: none; margin:0px 2px 0px 0px;" src="' + src + '"/&gt;';
+						}
+					*/
+
+					}
+					if (data[3]) {
+						lastModified = data[3] + '';
+						if (lastModified != '-') {
+							lastModified = lastModified.replace(/T/, ' ').replace(/\.000Z/, '');
+							var gdt = new GlideDateTime();
+							gdt.setValueUTC(lastModified, "yyyy-MM-dd HH:mm:ss");
+							lastModified = gdt.getDisplayValue()+'';
+						}
+					}
+					if (data[4]) {
+						size = data[4];
+						if (size != '-') {
+							var suffix = ' KB';
+							size = (parseInt(size)/1024).toFixed(2).toString();
+							if (size > 1023) {
+								size = (parseInt(size)/1024).toFixed(2).toString();
+								suffix = ' MB';
+							}
+							if (size > 1023) {
+								size = (parseInt(size)/1024).toFixed(2).toString();
+								suffix = ' GB';
+							}
+							size = size + suffix;
+						}
+					}
+					
+					var version = '-';
+					var versions = s3.fileVersions(filePath+dataName+'');
+					var verArr = [];
+					var verId = '';
+					var lastMod = '';
+					if (folder == 'false' $[AMP]$[AMP] versions.length > 0) {
+						version = '&lt;div style="width:75%;" class="col-sm-12 col-md-6 form-field input_controls">&lt;select style="height:17px;width:75%;" id="select_' + uID + '" class="form-control">';
+						version += '&lt;option>&lt;/option>';
+					for (var j = 0;j &lt; versions.length;j++) {
+						verArr = versions[j].split('^');
+						verId = verArr[0]+'';
+						lastMod = verArr[1]+'';
+						lastMod = lastMod.replace(/T/, ' ').replace(/\.000Z/, '');
+						var gdt = new GlideDateTime();
+						gdt.setValueUTC(lastMod, "yyyy-MM-dd HH:mm:ss");
+						lastMod = gdt.getDisplayValue()+'';
+						version += '&lt;option value="' + verId + '">' + lastMod + '&lt;/option>';
+					}
+						version += '&lt;/select>' + '&lt;/div>';
+					}
+					
+					dataName;
+				</g2:evaluate>
+
+				<li id="list_$[uID+'']" class="browse-file">
+					<div class="filename-col">
+						<span>
+							<g2:no_escape>$[iconDelURL]$[iconURL]</g2:no_escape>
+							<j2:if test="$[folder == 'false']">	
+								<j2:if test="$[version == '-']">	
+									<a id="$[uID]" onclick="s3FrameWorks('$[href]$[filePath]$[dataName]');" class="filename-link">$[dataName]</a>
+								</j2:if>
+								<j2:if test="$[version != '-']">	
+									<a id="$[uID]" onclick="var verSel = gel('select_$[uID]');var verSelOpt = verSel.options[verSel.selectedIndex].value;s3FrameWorks('$[href]$[filePath]$[dataName]$[AMP]sysparm_version=' + verSelOpt);" class="filename-link">$[dataName]</a>
+								</j2:if>
+							</j2:if>
+							<j2:if test="$[folder == 'true']">
+								<a id="$[uID]" onclick="window.location.href='$[href]$[filePath]$[dataName]';" class="filename-link">$[dataName]</a>
+							</j2:if>
+						</span>
+						<div class="filename-col__comment-count-bubble">         </div>
+					</div>
+					<div style="float:left;width:20%;" class="modified">
+						<span class="modified-time">$[lastModified]</span>
+					</div>
+					<div style="float:left;width:15%;" class="size">
+						<span class="file-size">$[size]</span>
+					</div>
+					<div class="version">
+						<g2:no_escape>$[version]</g2:no_escape>
+					</div>
+				</li>
+				
+		</j2:forEach>
+				
+		</ol>
+			
+		<br/>
+			<div>
+				<j2:if test="$[backURL != '']">
+					<button class="btn btn-primary" id="backButton" style="margin: 4px;display: inline;" onclick="window.location.href='x_snc_as_s3view.do?sysparm_file=$[backURL]';" type="button">Back</button>
+				</j2:if>
+				<button id="uploadButton" style="margin: 4px;" class="btn btn-default" onclick="manageFiles();" type="button">Upload Files</button>
+				<j2:if test="$[canDelete]">
+					<button class="btn btn-default" id="deleteButton" style="margin: 4px;display: inline;" onclick="deleteFilesMode();" type="button">Delete Files</button>
+					<button class="btn btn-destructive" id="deleteCommitButton" style="margin: 4px;display: none;" onclick="deleteFiles();" type="button">Commit Delete</button>
+				</j2:if>
+				<div style="float: right;">
+					<img src="https://awsmedia.s3.amazonaws.com/AWS_Logo_PoweredBy_127px.png" style="width: 127px;height:auto;"/>
+				</div>
+			</div>
+	</j2:if>
+	
+	<iframe id="s3FrameWorks" style="visibility:hidden;display:none" height="0" width="0" src=""/>
+</j2:if>
+</j:jelly>]]></html>
+        <name>s3view</name>
+        <processing_script/>
+        <sys_class_name>sys_ui_page</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2016-03-25 05:20:29</sys_created_on>
+        <sys_customer_update>true</sys_customer_update>
+        <sys_id>0dd5993e4f12d2000cd561128110c79d</sys_id>
+        <sys_mod_count>321</sys_mod_count>
+        <sys_name>s3view</sys_name>
+        <sys_package display_value="Amazon Storage" source="x_snc_as">878fbb5e4f9a92000cd561128110c765</sys_package>
+        <sys_policy/>
+        <sys_replace_on_upgrade>false</sys_replace_on_upgrade>
+        <sys_scope display_value="Amazon Storage">878fbb5e4f9a92000cd561128110c765</sys_scope>
+        <sys_update_name>sys_ui_page_0dd5993e4f12d2000cd561128110c79d</sys_update_name>
+        <sys_updated_by>bobby.edmonds</sys_updated_by>
+        <sys_updated_on>2016-04-14 16:11:05</sys_updated_on>
+    </sys_ui_page>
+</record_update>

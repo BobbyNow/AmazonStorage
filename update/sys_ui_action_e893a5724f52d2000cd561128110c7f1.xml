@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record_update sys_domain="global" table="sys_ui_action">
+    <sys_ui_action action="INSERT_OR_UPDATE">
+        <action_name>add_update_set</action_name>
+        <active>true</active>
+        <client>false</client>
+        <comments>Override to disable global button for non-admin</comments>
+        <condition>RP.getViewName() != '' &amp;&amp; gs.hasRole('admin')</condition>
+        <form_action>true</form_action>
+        <form_button>false</form_button>
+        <form_context_menu>false</form_context_menu>
+        <form_link>true</form_link>
+        <hint/>
+        <list_action>true</list_action>
+        <list_banner_button>false</list_banner_button>
+        <list_button>false</list_button>
+        <list_choice>true</list_choice>
+        <list_context_menu>false</list_context_menu>
+        <list_link>false</list_link>
+        <list_save_with_form_button>false</list_save_with_form_button>
+        <name>Add to Update Set</name>
+        <onclick/>
+        <order>100</order>
+        <script><![CDATA[addToUpdateSet();
+
+function addToUpdateSet(){
+	//Get current URL for return
+	var url = GlideSession.get().getStack().bottom();
+	
+	//Set to force update and save current record
+	current.setForceUpdate(true);
+	current.update();
+	
+	//Initialize updateManager
+	var updateManager = new GlideUpdateManager2();
+	
+	//If record is already included in update sets on save, do nothing
+	var currTable = current.getTableName();
+	if(currTable.startsWith('wf_') || currTable.startsWith('sys_ui_') || currTable == 'sys_choice' || current.getED().hasAttribute('update_synch') ||current.getED().hasAttribute('update_synch_custom')){
+		//Do nothing
+	}
+	//Else, add the record into the current update set
+	else{
+		updateManager.saveRecord(current);
+	}
+	
+	//If the current record *has* attachments, add those
+	if (current.hasAttachments()){
+		addAttachments(current, currTable);
+	}
+	
+	//If the current record *is* an attachment, add the chunks
+	if (currTable == 'sys_attachment'){
+		var attach_doc = new GlideRecord("sys_attachment_doc");
+		attach_doc.addQuery("sys_attachment", current.sys_id.toString());
+		attach_doc.orderBy("position");
+		attach_doc.query();
+		while (attach_doc.next()) {
+			updateManager.saveRecord(attach_doc);
+		}
+	}
+	
+	//Display confirmation
+	var currentSet = new GlideRecord('sys_update_set');
+	currentSet.get(gs.getPreference('sys_update_set'));
+	gs.flushMessages(); //Flush to avoid multiples when list updating
+	gs.addInfoMessage('Record(s) added to update set ' + currentSet.name + '.');
+	action.setRedirectURL(url);
+}
+
+//Add any attachments to the update set
+function addAttachments(record, table){
+	//Process the main sys_attachment record
+	var attach = new GlideRecord("sys_attachment");
+	attach.addQuery("table_name", table);
+	attach.addQuery("table_sys_id", record.sys_id.toString());
+	attach.query();
+	while (attach.next()) {
+		var updateManager = new GlideUpdateManager2();
+		updateManager.saveRecord(attach);
+		
+		//Process each sys_attachment_doc chunk
+		var attach_doc = new GlideRecord("sys_attachment_doc");
+		attach_doc.addQuery("sys_attachment", attach.sys_id.toString());
+		attach_doc.orderBy("position");
+		attach_doc.query();
+		while (attach_doc.next()) {
+			updateManager.saveRecord(attach_doc);
+		}
+	}
+}]]></script>
+        <show_insert>false</show_insert>
+        <show_multiple_update>false</show_multiple_update>
+        <show_query>false</show_query>
+        <show_update>true</show_update>
+        <sys_class_name>sys_ui_action</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2016-03-25 06:20:00</sys_created_on>
+        <sys_customer_update>true</sys_customer_update>
+        <sys_domain>global</sys_domain>
+        <sys_domain_path>/</sys_domain_path>
+        <sys_id>e893a5724f52d2000cd561128110c7f1</sys_id>
+        <sys_mod_count>1</sys_mod_count>
+        <sys_name>Add to Update Set</sys_name>
+        <sys_overrides/>
+        <sys_package display_value="Amazon Storage" source="x_snc_as">878fbb5e4f9a92000cd561128110c765</sys_package>
+        <sys_policy/>
+        <sys_replace_on_upgrade>false</sys_replace_on_upgrade>
+        <sys_scope display_value="Amazon Storage">878fbb5e4f9a92000cd561128110c765</sys_scope>
+        <sys_update_name>sys_ui_action_e893a5724f52d2000cd561128110c7f1</sys_update_name>
+        <sys_updated_by>bobby.edmonds</sys_updated_by>
+        <sys_updated_on>2016-04-13 19:27:13</sys_updated_on>
+        <table>x_snc_as_s3upload</table>
+        <ui11_compatible>false</ui11_compatible>
+        <ui16_compatible>false</ui16_compatible>
+    </sys_ui_action>
+</record_update>

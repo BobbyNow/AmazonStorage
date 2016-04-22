@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record_update sys_domain="global" table="sys_ui_ng_action">
+    <sys_ui_ng_action action="INSERT_OR_UPDATE">
+        <action_name>redirect</action_name>
+        <active>true</active>
+        <color/>
+        <comments/>
+        <condition/>
+        <form_button>false</form_button>
+        <form_more_item>true</form_more_item>
+        <hide_when_disabled>false</hide_when_disabled>
+        <hint/>
+        <list_button>false</list_button>
+        <name>Amazon Storage</name>
+        <navigate_back>false</navigate_back>
+        <order>100</order>
+        <script><![CDATA[action.setRedirectURL('x_snc_as_s3view.do?sysparm_table='+current.getTableName()+'&sysparm_sys_id=' + current.sys_id + '&sysparm_device=doctype');]]></script>
+        <show_for>update</show_for>
+        <sys_class_name>sys_ui_ng_action</sys_class_name>
+        <sys_created_by>bobby.edmonds@snc</sys_created_by>
+        <sys_created_on>2016-03-27 02:04:36</sys_created_on>
+        <sys_customer_update>true</sys_customer_update>
+        <sys_domain>global</sys_domain>
+        <sys_domain_path>/</sys_domain_path>
+        <sys_id>434c72174fdad2000cd561128110c727</sys_id>
+        <sys_mod_count>3</sys_mod_count>
+        <sys_name>Amazon Storage</sys_name>
+        <sys_overrides/>
+        <sys_package display_value="Amazon Storage" source="x_snc_as">878fbb5e4f9a92000cd561128110c765</sys_package>
+        <sys_policy/>
+        <sys_replace_on_upgrade>false</sys_replace_on_upgrade>
+        <sys_scope display_value="Amazon Storage">878fbb5e4f9a92000cd561128110c765</sys_scope>
+        <sys_update_name>sys_ui_ng_action_434c72174fdad2000cd561128110c727</sys_update_name>
+        <sys_updated_by>bobby.edmonds</sys_updated_by>
+        <sys_updated_on>2016-04-14 06:11:15</sys_updated_on>
+        <table>incident</table>
+    </sys_ui_ng_action>
+</record_update>

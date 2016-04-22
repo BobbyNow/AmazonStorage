@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record_update sys_domain="global" table="sys_user_has_role">
+    <sys_user_has_role action="INSERT_OR_UPDATE">
+        <granted_by/>
+        <included_in_role display_value="Created 2016-04-01 23:26:57">a8e1f6994fae56000cd561128110c736</included_in_role>
+        <included_in_role_instance display_value="x_snc_as.amazon_storage_user.x_snc_as.amazon_storage_tenant_admin">4cfa33384fa656000cd561128110c740</included_in_role_instance>
+        <inherited>true</inherited>
+        <role display_value="x_snc_as.amazon_storage_user" name="x_snc_as.amazon_storage_user">a10408264fda92000cd561128110c712</role>
+        <state>active</state>
+        <sys_created_by>bobby.edmonds</sys_created_by>
+        <sys_created_on>2016-04-02 06:26:57</sys_created_on>
+        <sys_domain>global</sys_domain>
+        <sys_domain_path>/</sys_domain_path>
+        <sys_id>a4e1b6d94fae56000cd561128110c7cf</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>bobby.edmonds</sys_updated_by>
+        <sys_updated_on>2016-04-02 06:26:57</sys_updated_on>
+        <user display_value="AWS Global Admin">7dd1f6994fae56000cd561128110c734</user>
+    </sys_user_has_role>
+</record_update>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<database>
+    <element attributes="domain_master=document_id" label="File upload for:" max_length="40" name="x_snc_as_s3upload" type="collection">
+        <element attributes="allow_public=true" dependent="document_table" dependent_on_field="document_table" display="true" label="Document ID" max_length="32" name="document_id" type="document_id" use_dependent_field="true"/>
+        <element attributes="allow_public=true" label="Document table" max_length="80" name="document_table" type="table_name"/>
+        <index name="index">
+            <element name="document_id"/>
+        </index>
+    </element>
+</database>

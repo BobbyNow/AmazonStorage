@@ -2,20 +2,20 @@
 <record_update table="sys_security_acl_role">
     <sys_security_acl_role action="INSERT_OR_UPDATE">
         <sys_class_name>sys_security_acl_role</sys_class_name>
-        <sys_created_by>admin</sys_created_by>
-        <sys_created_on>2016-03-28 08:49:10</sys_created_on>
-        <sys_customer_update>false</sys_customer_update>
-        <sys_id>cf72a9fb4f5216000cd561128110c718</sys_id>
-        <sys_mod_count>2</sys_mod_count>
+        <sys_created_by>bobby.edmonds</sys_created_by>
+        <sys_created_on>2016-04-22 23:39:33</sys_created_on>
+        <sys_customer_update>true</sys_customer_update>
+        <sys_id>ed0ed5484f8312000cd561128110c77e</sys_id>
+        <sys_mod_count>1</sys_mod_count>
         <sys_name>x_snc_as_properties.x_snc_as.amazon_storage_tenant_admin</sys_name>
         <sys_package display_value="Amazon Storage" source="x_snc_as">878fbb5e4f9a92000cd561128110c765</sys_package>
         <sys_policy/>
         <sys_replace_on_upgrade>false</sys_replace_on_upgrade>
         <sys_scope display_value="Amazon Storage">878fbb5e4f9a92000cd561128110c765</sys_scope>
-        <sys_security_acl display_value="x_snc_as_properties">0772a9fb4f5216000cd561128110c718</sys_security_acl>
-        <sys_update_name>sys_security_acl_role_cf72a9fb4f5216000cd561128110c718</sys_update_name>
-        <sys_updated_by>admin</sys_updated_by>
-        <sys_updated_on>2016-03-31 22:27:20</sys_updated_on>
+        <sys_security_acl display_value="x_snc_as_properties">a10ed5484f8312000cd561128110c77e</sys_security_acl>
+        <sys_update_name>sys_security_acl_role_ed0ed5484f8312000cd561128110c77e</sys_update_name>
+        <sys_updated_by>bobby.edmonds</sys_updated_by>
+        <sys_updated_on>2016-04-22 23:44:22</sys_updated_on>
         <sys_user_role display_value="x_snc_as.amazon_storage_tenant_admin" name="x_snc_as.amazon_storage_tenant_admin">4ce208e24fda92000cd561128110c7c0</sys_user_role>
         <transaction_id/>
     </sys_security_acl_role>

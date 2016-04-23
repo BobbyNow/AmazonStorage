@@ -26,11 +26,26 @@ AWSS3.prototype = {
 		
 		
 		this.domainConfigured = false;
-		var gr = new GlideRecord('x_snc_as_properties');
-		if (gr.get('sys_domain', domain_sys_id)) {
-			this.domainConfigured = true;
+		
+		//This is for the Test Configuration option so it can test an inactive property file
+		if (recordObj.getTableName() == 'x_snc_as_properties') {
+			var gr = new GlideRecord('x_snc_as_properties');
+			if (gr.get(recordObj.sys_id)) {
+				this.domainConfigured = true;
+			} else {
+				return false;
+			}
 		} else {
-			return false;
+			//For normal usage a properties file has to be active
+			var gr = new GlideRecord('x_snc_as_properties');
+			gr.addActiveQuery();
+			gr.addQuery('sys_domain', domain_sys_id);
+			gr.query();
+			if (gr.next()) {
+				this.domainConfigured = true;
+			} else {
+				return false;
+			}
 		}
 		
 		this.aKey = gr.access_key.getDecryptedValue()+'';
@@ -789,9 +804,9 @@ AWSS3.prototype = {
         <sys_class_name>sys_script_include</sys_class_name>
         <sys_created_by>admin</sys_created_by>
         <sys_created_on>2016-03-24 05:02:05</sys_created_on>
-        <sys_customer_update>false</sys_customer_update>
+        <sys_customer_update>true</sys_customer_update>
         <sys_id>b2b7c8664fda92000cd561128110c7dc</sys_id>
-        <sys_mod_count>259</sys_mod_count>
+        <sys_mod_count>263</sys_mod_count>
         <sys_name>AWSS3</sys_name>
         <sys_package display_value="Amazon Storage" source="x_snc_as">878fbb5e4f9a92000cd561128110c765</sys_package>
         <sys_policy>read</sys_policy>
@@ -799,6 +814,6 @@ AWSS3.prototype = {
         <sys_scope display_value="Amazon Storage">878fbb5e4f9a92000cd561128110c765</sys_scope>
         <sys_update_name>sys_script_include_b2b7c8664fda92000cd561128110c7dc</sys_update_name>
         <sys_updated_by>bobby.edmonds</sys_updated_by>
-        <sys_updated_on>2016-04-14 15:50:13</sys_updated_on>
+        <sys_updated_on>2016-04-23 00:08:23</sys_updated_on>
     </sys_script_include>
 </record_update>

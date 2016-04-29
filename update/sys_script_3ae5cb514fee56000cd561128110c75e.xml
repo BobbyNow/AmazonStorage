@@ -37,6 +37,53 @@
 	while (gr.next()) {
 		msg += '&nbsp;&nbsp;<b>Table:</b> ' + gr.sys_ui_formatter.table + '&nbsp;&nbsp;&nbsp;&nbsp;<b>View:</b> ' + gr.sys_ui_section.view.sys_name+ '&nbsp;&nbsp;&nbsp;&nbsp;<b>Domain:</b> '+ gr.sys_ui_section.sys_domain.getDisplayValue() + '<br/>';
 	}
+	
+	//Global admin instructions
+	if (gs.hasRole('x_snc_as.amazon_storage_admin')) {
+		msg+= '<br/><b>Admin Instructions</b>' +
+		'<br/>1. Create a formatter for each table to be enabled in the instance.' +
+		'<br/>&nbsp;&nbsp;&nbsp;&nbsp;a. Name: "Amazon Storage".' +
+		'<br/>&nbsp;&nbsp;&nbsp;&nbsp;b. Formatter: "x_snc_as_s3view".' +
+		'<br/>&nbsp;&nbsp;&nbsp;&nbsp;c. Table: "TableToBeEnabled".' +
+		'<br/>2. Create a new Section on each of the table views you are enabling.' +
+		'<br/>&nbsp;&nbsp;&nbsp;&nbsp;a. Section name: "Amazon Storage".' +
+		'<br/>&nbsp;&nbsp;&nbsp;&nbsp;b. Add the "Amazon Storage" formatter to the section.';
+		
+	}
+	
+	//Tenant admin instructions
+	if (gs.hasRole('x_snc_as.amazon_storage_tenant_admin')) {
+		msg+= '<br/><br/><b>Tenant Instructions</b>' +
+'<br/>To use Amazon Storage, the following steps must be completed.' +
+'<br/>1. The Global Admin must first enable Amazon Storage on selected tables.' +
+'<br/>&nbsp;&nbsp;&nbsp;&nbsp;a. Check with the Global Admin.' +
+'<br/>2. Navigate to <a target="_blank" href="https://aws.amazon.com/s3/">https://aws.amazon.com/s3/</a>, and setup an amazon S3 account.' +
+'<br/>3. Login and navigate to the S3 console.' +
+'<br/>&nbsp;&nbsp;&nbsp;&nbsp;a. <a target="_blank" href="https://console.aws.amazon.com/s3">https://console.aws.amazon.com/s3</a>' +
+'<br/>4. Create a Bucket in the region of your preference.' +
+'<br/>&nbsp;&nbsp;&nbsp;&nbsp;a. The Bucket is the highest level container for your instance.' +
+'<br/>&nbsp;&nbsp;&nbsp;&nbsp;b. E.g. myinstance-servicenow-acme.' +
+'<br/>5. Navigate to <a target="_blank" href="http://docs.aws.amazon.com/general/latest/gr/rande.html#s3_region">http://docs.aws.amazon.com/general/latest/gr/rande.html#s3_region</a>' +
+'<br/>&nbsp;&nbsp;&nbsp;&nbsp;a. Find the region you used and take note of the Endpoint for later.' +
+'<br/>6. In the Amazon S3 console navigate to <b>Security Credentials</b> under your name on the top of the screen.' +
+'<br/>&nbsp;&nbsp;&nbsp;&nbsp;a. Select <b>Access Keys</b> (Access Key ID and Secret Access Key).' +
+'<br/>&nbsp;&nbsp;&nbsp;&nbsp;b. Click <b>Create New Access Key</b>, and then take note of the Secret and Access Keys.' +
+'<br/>7. Navigate back to <b>Amazon Storage</b> > <b>Properties</b> in ServiceNow' +
+'<br/>&nbsp;&nbsp;&nbsp;&nbsp;a. Create a Properties record, complete all fields, and Save.' +
+'<br/>8. Test the properties configuration' +
+'<br/>&nbsp;&nbsp;&nbsp;&nbsp;a. Click <b>Test Configuration</b> under related links on the properties page.';
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	gs.addInfoMessage(msg + '</div>');
 	
 })(current, previous);]]></script>
@@ -47,7 +94,7 @@
         <sys_domain>global</sys_domain>
         <sys_domain_path>/</sys_domain_path>
         <sys_id>3ae5cb514fee56000cd561128110c75e</sys_id>
-        <sys_mod_count>13</sys_mod_count>
+        <sys_mod_count>23</sys_mod_count>
         <sys_name>Display Info</sys_name>
         <sys_overrides/>
         <sys_package display_value="Amazon Storage" source="x_snc_as">878fbb5e4f9a92000cd561128110c765</sys_package>
@@ -55,8 +102,8 @@
         <sys_replace_on_upgrade>false</sys_replace_on_upgrade>
         <sys_scope display_value="Amazon Storage">878fbb5e4f9a92000cd561128110c765</sys_scope>
         <sys_update_name>sys_script_3ae5cb514fee56000cd561128110c75e</sys_update_name>
-        <sys_updated_by>bobby.edmonds</sys_updated_by>
-        <sys_updated_on>2016-04-14 19:11:39</sys_updated_on>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2016-04-29 19:02:24</sys_updated_on>
         <template/>
         <when>before_display</when>
     </sys_script>

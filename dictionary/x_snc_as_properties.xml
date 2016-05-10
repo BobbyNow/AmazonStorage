@@ -5,6 +5,7 @@
         <element label="Active" max_length="40" name="active" type="boolean"/>
         <element label="Bucket" max_length="63" name="bucket" type="string"/>
         <element label="Endpoint" max_length="1024" name="endpoint" type="url"/>
+        <element hint="Optional image that displays on the bottom right of the page for the user." label="Image URL" max_length="1024" name="image_url" type="url"/>
         <element label="Secret key" max_length="255" name="secret_key" type="password2"/>
         <element label="Domain" max_length="32" name="sys_domain" type="domain_id"/>
         <element attributes="case_sensitive=true" label="Domain Path" max_length="255" name="sys_domain_path" type="domain_path"/>

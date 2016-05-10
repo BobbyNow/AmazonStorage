@@ -303,7 +303,10 @@ AWSS3.prototype = {
 	
 	//USED BY this.getFile()
 	_genLink: function(filePath, sig, expires, versionId) {
-		var url = "https://"+this.bucket()+".s3.amazonaws.com/"+ filePath +
+		//Google uses a separate URI for authenticated browser downloads
+		var ep = this.endPoint().replace('storage.googleapis.com', 'storage.cloud.google.com');
+		
+		var url = ep + "/" + this.bucket() + "/" + filePath +
 		"?response-content-type=application/octet-stream" +
 		"&AWSAccessKeyId=" + this.accessKey() +
 		"&Expires="+ expires +
@@ -806,14 +809,14 @@ AWSS3.prototype = {
         <sys_created_on>2016-03-24 05:02:05</sys_created_on>
         <sys_customer_update>false</sys_customer_update>
         <sys_id>b2b7c8664fda92000cd561128110c7dc</sys_id>
-        <sys_mod_count>263</sys_mod_count>
+        <sys_mod_count>264</sys_mod_count>
         <sys_name>AWSS3</sys_name>
         <sys_package display_value="Amazon Storage" source="x_snc_as">878fbb5e4f9a92000cd561128110c765</sys_package>
         <sys_policy>read</sys_policy>
         <sys_replace_on_upgrade>false</sys_replace_on_upgrade>
         <sys_scope display_value="Amazon Storage">878fbb5e4f9a92000cd561128110c765</sys_scope>
         <sys_update_name>sys_script_include_b2b7c8664fda92000cd561128110c7dc</sys_update_name>
-        <sys_updated_by>bobby.edmonds</sys_updated_by>
-        <sys_updated_on>2016-04-23 00:08:23</sys_updated_on>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2016-05-10 05:00:41</sys_updated_on>
     </sys_script_include>
 </record_update>
